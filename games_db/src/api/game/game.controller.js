@@ -17,7 +17,8 @@ const postGame = async (req, res, next) => {
       return next(error);
     }
   };
-
+//crear función si el admin es igual igual igual pues puede hacer cosas
+//para los votos crear un contador 
   const getGames = async (req, res, next) => {
     try {
       const games = await Game.find();
