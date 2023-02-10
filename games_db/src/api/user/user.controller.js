@@ -1,8 +1,8 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-const User = require("./user.model");
-const { setError } = require("../../helpers/error/handle.error");
+const User = require('./user.model');
+const { setError } = require('../../helpers/error/handle.error');
 
 const registerUser = async (req, res, next) => {
   try {
@@ -13,16 +13,16 @@ const registerUser = async (req, res, next) => {
       userName: newUser.userName,
     });
     console.log(userDuplicate);
-    if (userDuplicate) return next("User already exists");
+    if (userDuplicate) return next('User already exists');
 
     const newUserDB = newUser.save();
     return res.json({
       status: 201,
-      message: "User registered",
+      message: 'User registered',
       data: newUserDB,
     });
   } catch (error) {
-    return next(setError(500, "User registered fail"));
+    return next(setError(500, 'User registered fail'));
   }
 };
 
@@ -35,22 +35,44 @@ const loginUser = async (req, res, next) => {
         {
           id: userInfo._id,
           username: userInfo.username,
+          role: userInfo.role,
         },
-        req.app.get("secretKey"),
-        { expiresIn: "200h" }
+        req.app.get('secretKey'),
+        { expiresIn: '200h' },
       );
       return res.json({
         status: 200,
-        message: "Welcome Back",
+        message: 'Welcome Back',
         user: userInfo,
         token: token,
       });
     } else {
-      return next("Incorrect password");
+      return next('Incorrect password');
     }
   } catch (error) {
-    return next(setError(500, "User login fail"));
+    return next(setError(500, 'User login fail'));
+  }
+};
+const patchUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = new User(req.body);
+    patient._id = id;
+    const updateUser = await User.findByIdAndUpdate(id, user);
+    return res.status(200).json(updateUser);
+  } catch (error) {
+    return next(error);
   }
 };
 
-module.exports = { registerUser, loginUser };
+const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findByIdAndDelete(id);
+    return res.status(200).json(user);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = { registerUser, loginUser, patchUser, deleteUser };

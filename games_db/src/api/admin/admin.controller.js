@@ -28,13 +28,13 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const adminInfo = await Admin.findOne({ adminname: req.body.adminname });
+    const adminInfo = await Admin.findOne({ adminName: req.body.adminName });
     if (bcrypt.compareSync(req.body.password, adminInfo.password)) {
       adminInfo.password = null;
       const token = jwt.sign(
         {
           id: adminInfo._id,
-          adminname: adminInfo.adminname,
+          adminname: adminInfo.adminName,
         },
         req.app.get('secretKey'),
         { expiresIn: '200h' },
@@ -54,29 +54,29 @@ const login = async (req, res, next) => {
 };
 
 const patchAdmin = async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const admin = new Admin(req.body);
-      if (req.file) {
-        doctor._id = id;
-        doctor._id.image = req.file.path;
-      }
-  
-      const updateAdmin = await Admin.findByIdAndUpdate(id, admin);
-      return res.status(200).json(updateAdmin);
-    } catch (error) {
-      return next(error);
+  try {
+    const { id } = req.params;
+    const admin = new Admin(req.body);
+    if (req.file) {
+      doctor._id = id;
+      doctor._id.image = req.file.path;
     }
-  };
-  
-  const deleteAdmin = async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const admin = await Admin.findByIdAndDelete(id);
-      return res.status(200).json(admin);
-    } catch (error) {
-      return next(error);
-    }
-  };
+
+    const updateAdmin = await Admin.findByIdAndUpdate(id, admin);
+    return res.status(200).json(updateAdmin);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const deleteAdmin = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const admin = await Admin.findByIdAndDelete(id);
+    return res.status(200).json(admin);
+  } catch (error) {
+    return next(error);
+  }
+};
 
 module.exports = { register, login, patchAdmin, deleteAdmin };
